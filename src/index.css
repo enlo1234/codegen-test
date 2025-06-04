@@ -1,0 +1,75 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  code {
+    font-family: 'Fira Code', monospace;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+
+  .btn-primary {
+    @apply bg-purple-600 hover:bg-purple-700 text-white focus:ring-purple-500;
+  }
+
+  .btn-secondary {
+    @apply bg-teal-600 hover:bg-teal-700 text-white focus:ring-teal-500;
+  }
+
+  .btn-outline {
+    @apply border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 focus:ring-slate-500;
+  }
+
+  .card {
+    @apply bg-white dark:bg-slate-800 rounded-lg shadow-md p-6;
+  }
+
+  .tab {
+    @apply px-4 py-2 font-medium border-b-2 border-transparent hover:text-purple-600 dark:hover:text-purple-400 transition-colors;
+  }
+
+  .tab-active {
+    @apply text-purple-600 dark:text-purple-400 border-purple-600 dark:border-purple-400;
+  }
+}
+
+.method-highlight {
+  @apply border-l-4 border-purple-500 pl-3 my-4;
+  animation: pulse-border 2s ease-in-out;
+}
+
+@keyframes pulse-border {
+  0%, 100% { @apply border-purple-500; }
+  50% { @apply border-teal-500; }
+}
+
+.flow-animation path {
+  stroke-dasharray: 10;
+  stroke-dashoffset: 10;
+  animation: dash 1.5s linear forwards;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
