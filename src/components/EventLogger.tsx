@@ -5,7 +5,7 @@ import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface EventLog {
   timestamp: string;
-  source: 'avo' | 'custom';
+  source: 'avo-validation' | 'avo-sent' | 'custom';
   eventName: string;
   properties: Record<string, any>;
 }
@@ -35,7 +35,7 @@ const EventLogger: React.FC = () => {
           if (typeof args[0] === 'string' && args[0].startsWith('[avo] Event Sent:')) {
             const newLog = {
               timestamp: new Date().toISOString(),
-              source: 'avo',
+              source: args[0].includes('validation') ? 'avo-validation' : 'avo-sent',
               eventName: args[1] || 'Unknown Event',
               properties: args[3] || {}
             };
@@ -51,12 +51,38 @@ const EventLogger: React.FC = () => {
     initAvo();
   }, []);
 
+  const getBadgeColor = (source: string) => {
+    switch (source) {
+      case 'avo-validation':
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300';
+      case 'avo-sent':
+        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300';
+      case 'custom':
+        return 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300';
+      default:
+        return 'bg-slate-100 dark:bg-slate-900/30 text-slate-700 dark:text-slate-300';
+    }
+  };
+
+  const getSourceLabel = (source: string) => {
+    switch (source) {
+      case 'avo-validation':
+        return 'Avo Validation';
+      case 'avo-sent':
+        return 'Avo Sent';
+      case 'custom':
+        return 'Custom';
+      default:
+        return source;
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-bold mb-2">Event Logger</h2>
         <p className="text-slate-600 dark:text-slate-400">
-          Receiving and logging events from both Avo and the custom destination
+          Monitoring events through the analytics pipeline
         </p>
       </div>
 
@@ -66,13 +92,19 @@ const EventLogger: React.FC = () => {
           <div className="space-y-3">
             <div>
               <h3 className="font-semibold text-slate-900 dark:text-slate-100">Event Flow</h3>
-              <p className="text-sm text-slate-600 dark:text-slate-400">Events are processed in two stages:</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400">Events are processed in three stages:</p>
             </div>
             <div className="space-y-2">
               <div className="bg-white dark:bg-slate-800 p-3 rounded-md border border-slate-200 dark:border-slate-700">
+                <p className="font-mono text-sm text-blue-600 dark:text-blue-400">[avo] Event Validation</p>
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                  Avo validates the event structure and properties
+                </p>
+              </div>
+              <div className="bg-white dark:bg-slate-800 p-3 rounded-md border border-slate-200 dark:border-slate-700">
                 <p className="font-mono text-sm text-purple-600 dark:text-purple-400">[avo] Event Sent</p>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
-                  Avo validates and processes the event before sending it to the destination
+                  Avo processes and sends the event to destinations
                 </p>
               </div>
               <div className="bg-white dark:bg-slate-800 p-3 rounded-md border border-slate-200 dark:border-slate-700">
@@ -101,17 +133,13 @@ const EventLogger: React.FC = () => {
               <div key={index} className="p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className={`font-medium ${
-                    log.source === 'avo' ? 'text-purple-600 dark:text-purple-400' : 'text-teal-600 dark:text-teal-400'
+                    log.source.startsWith('avo') ? 'text-purple-600 dark:text-purple-400' : 'text-teal-600 dark:text-teal-400'
                   }`}>
                     {log.eventName}
                   </span>
                   <div className="flex items-center gap-2">
-                    <span className={`text-xs px-2 py-1 rounded ${
-                      log.source === 'avo' 
-                        ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' 
-                        : 'bg-teal-100 dark:bg-teal-900/30 text-teal-700 dark:text-teal-300'
-                    }`}>
-                      {log.source === 'avo' ? 'Avo' : 'Custom'}
+                    <span className={`text-xs px-2 py-1 rounded ${getBadgeColor(log.source)}`}>
+                      {getSourceLabel(log.source)}
                     </span>
                     <span className="text-sm text-slate-500 dark:text-slate-400">
                       {new Date(log.timestamp).toLocaleTimeString()}
